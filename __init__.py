@@ -1,14 +1,16 @@
 # __init__.py
 
-from .detail_daemon_node import DetailDaemonNode, MultiplySigmas
+from .detail_daemon_node import DetailDaemonSamplerNode, DetailDaemonGraphSigmasNode, MultiplySigmas
 
 NODE_CLASS_MAPPINGS = {
-    "DetailDaemonNode": DetailDaemonNode,
+    "DetailDaemonSamplerNode": DetailDaemonSamplerNode,
+    "DetailDaemonGraphSigmasNode": DetailDaemonGraphSigmasNode,
     "MultiplySigmas": MultiplySigmas
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DetailDaemonNode": "Detail Daemon",
+    "DetailDaemonSamplerNode": "Detail Daemon Sampler",
+    "DetailDaemonGraphSigmasNode": "Detail Daemon Graph Sigmas",
     "MultiplySigmas": "Multiply Sigmas (stateless)"
 }
 
