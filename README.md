@@ -20,7 +20,7 @@ Allows sampling with the Detail Daemon schedule adjustment, which keeps the nois
 
 ![Screenshot 2024-10-29 131939](https://github.com/user-attachments/assets/d0a3f895-5f6d-4b94-b4d1-aa86e7acb5d7)
 
-Allows graphing adjusted sigmas to visually see the effects of different parameters. This had to be a separate node from the Detail Daemon Sampler node in order to function properly. Just set the values the same, or set inputs on separate nodes that feed into both the Detail Daemon Sampler and this Graph Sigmas node. You'll need to run the queue in order to see the graph on the node.
+Allows graphing adjusted sigmas to visually see the effects of different parameters on a graphed curve. This had to be a separate node from the Detail Daemon Sampler node in order to function properly. Just set the values the same as that node, or set inputs on separate primitive nodes that input into both the Detail Daemon Sampler and this Graph Sigmas node. You'll need to run the queue in order to see the graph on the node. *Please note: this node doesn't actually change the sigmas used when generating, it only graphs them*.
 
 ### Multiply Sigmas
 
