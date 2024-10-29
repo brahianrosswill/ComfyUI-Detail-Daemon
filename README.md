@@ -36,9 +36,9 @@ A simpler version of Detail Daemon Sampler, with only amount adjustment (-0.05 d
 
 ## Example and testing workflow
 
-![Screenshot 2024-10-29 134541](https://github.com/user-attachments/assets/a3d2849d-4ed0-4b5b-adca-48dcd07132ca)
+[![Screenshot 2024-10-29 134541](https://github.com/user-attachments/assets/a3d2849d-4ed0-4b5b-adca-48dcd07132ca)](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json)
 
-The `Comparing Detailers.json` workflow will allow you to compare these various detailer nodes on the same prompt and seed.
+The [Comparing Detailers.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json) workflow will allow you to compare these various detailer nodes on the same prompt and seed.
 
 ## Credits
 
