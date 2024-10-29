@@ -381,6 +381,8 @@ class DetailDaemonSamplerNode:
                 },
             ),
         )
+
+#MultiplySigmas Node
 class MultiplySigmas:
     @classmethod
     def INPUT_TYPES(s):
@@ -399,3 +401,83 @@ class MultiplySigmas:
         # Clone the sigmas to ensure the input is not modified (stateless)
         sigmas = sigmas.clone()
         return (sigmas * factor,)
+
+#LyingSigmaSampler
+def lying_sigma_sampler(
+    model,
+    x,
+    sigmas,
+    *,
+    lss_wrapped_sampler,
+    lss_dishonesty_factor,
+    lss_startend_percent,
+    **kwargs,
+):
+    start_percent, end_percent = lss_startend_percent
+    ms = model.inner_model.inner_model.model_sampling
+    start_sigma, end_sigma = (
+        round(ms.percent_to_sigma(start_percent), 4),
+        round(ms.percent_to_sigma(end_percent), 4),
+    )
+    del ms
+
+    def model_wrapper(x, sigma, **extra_args):
+        sigma_float = float(sigma.max().detach().cpu())
+        if end_sigma <= sigma_float <= start_sigma:
+            sigma = sigma * (1.0 + lss_dishonesty_factor)
+        return model(x, sigma, **extra_args)
+
+    for k in (
+        "inner_model",
+        "sigmas",
+    ):
+        if hasattr(model, k):
+            setattr(model_wrapper, k, getattr(model, k))
+    return lss_wrapped_sampler.sampler_function(
+        model_wrapper,
+        x,
+        sigmas,
+        **kwargs,
+        **lss_wrapped_sampler.extra_options,
+    )
+
+
+class LyingSigmaSamplerNode:
+    CATEGORY = "sampling/custom_sampling"
+    RETURN_TYPES = ("SAMPLER",)
+    FUNCTION = "go"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "sampler": ("SAMPLER",),
+                "dishonesty_factor": (
+                    "FLOAT",
+                    {
+                        "default": -0.05,
+                        "min": -0.999,
+                        "step": 0.01,
+                        "tooltip": "Multiplier for sigmas passed to the model. -0.05 means we reduce the sigma by 5%.",
+                    },
+                ),
+            },
+            "optional": {
+                "start_percent": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "end_percent": ("FLOAT", {"default": 0.9, "min": 0.0, "max": 1.0, "step": 0.01}),
+            },
+        }
+
+    @classmethod
+    def go(cls, sampler, dishonesty_factor, *, start_percent=0.0, end_percent=1.0):
+        return (
+            KSAMPLER(
+                lying_sigma_sampler,
+                extra_options={
+                    "lss_wrapped_sampler": sampler,
+                    "lss_dishonesty_factor": dishonesty_factor,
+                    "lss_startend_percent": (start_percent, end_percent),
+                },
+            ),
+        )
+
