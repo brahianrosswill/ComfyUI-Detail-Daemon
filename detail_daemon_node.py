@@ -7,9 +7,11 @@ import io
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torchvision.transforms as tvtrans
 from comfy.samplers import KSAMPLER
 from PIL import Image
+import folder_paths
+import random
+import os
 
 
 # Schedule creation function from https://github.com/muerrilla/sd-webui-detail-daemon
@@ -110,8 +112,8 @@ class DetailDaemonGraphSigmasNode:
             },
         }
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("plot_adjustment_image",)
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
     CATEGORY = "sampling/custom_sampling/sigmas"
     FUNCTION = "make_graph"
 
@@ -168,11 +170,29 @@ class DetailDaemonGraphSigmasNode:
 
         # Create the plot for visualization
         image = self.plot_schedule(schedule)
+        
+        # Save temp image
+        output_dir = folder_paths.get_temp_directory()
+        prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+        
+        full_output_folder, filename, counter, subfolder, _ = (
+        folder_paths.get_save_image_path(prefix_append, output_dir)
+        )
+        filename = f"{filename}_{counter:05}_.png"
+        file_path = os.path.join(full_output_folder, filename)
+        image.save(file_path, compress_level=1)
 
-        return (image,)
+        return {
+            "ui": {
+                "images": [
+                    {"filename": filename, "subfolder": subfolder, "type": "temp"},
+                ],
+            }
+        }
+
 
     @staticmethod
-    def plot_schedule(schedule) -> torch.Tensor:
+    def plot_schedule(schedule) -> Image:
         plt.figure(figsize=(6, 4))  # Adjusted width
         plt.plot(schedule, label="Sigma Adjustment Curve")
         plt.xlabel("Steps")
@@ -193,7 +213,7 @@ class DetailDaemonGraphSigmasNode:
         plt.close()
         buf.seek(0)
         image = Image.open(buf)
-        return tvtrans.ToTensor()(image).permute(1, 2, 0).unsqueeze(0)
+        return image
 
 
 def get_dd_schedule(
