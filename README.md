@@ -14,7 +14,7 @@ A port of muerrilla's [sd-webui-Detail-Daemon](https://github.com/muerrilla/sd-w
 
 ![Screenshot 2024-10-29 124741](https://github.com/user-attachments/assets/c11bd716-1fa1-43b6-8d64-ab20642bceb5)
 
-Allows sampling with the Detail Daemon schedule adjustment, which keeps the noise levels injected the same while lowering the amount of noise removed at each step, which effectively adds detail. Detail_amounts between 0 and 1.0 work best. See muerrilla's [Detail Daemon](https://github.com/muerrilla/sd-webui-detail-daemon/) repo for full explanation of inputs and methodology.
+Allows sampling with the Detail Daemon schedule adjustment, which keeps the noise levels injected the same while lowering the amount of noise removed at each step, which effectively adds detail. Detail_amounts between 0 and 1.0 work best. See muerrilla's [Detail Daemon](https://github.com/muerrilla/sd-webui-detail-daemon/) repo for full explanation of inputs and methodology. Generally speaking, large features are established in earlier steps and small details take shape in later steps. So adjusting the amount in earlier steps will affect bigger shapes, and adjusting it in later steps will influence smaller fine details. The default adjusts mostly in the middle steps.
 
 Parameters (the graphing node below can help visualize these parameters):
 - `detail_amount`: the main value that adjusts the detail in the middle of the generation process. Positive values lower the sigmas, reducing noise removed at each step, which increases detail. For Flux models, you'll probably want between 0.1–1.0 range. For SDXL models, probably less than 0.25. You can also use negative values if you want to *decrease* detail or simplify the image.
