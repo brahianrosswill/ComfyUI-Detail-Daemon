@@ -34,11 +34,12 @@ Simple node to multiply all sigmas by the supplied factor (multiplies both the n
 
 A simpler version of Detail Daemon Sampler, with only amount adjustment (-0.05 dishonesty_factor is equivalent of 0.5 in detail_amount of Detail Daemon), start and end values. Dishonesty values between -0.1 and -0.01 work best.
 
-## Example and testing workflow
+## Example and testing workflows
 
 [![Screenshot 2024-10-29 134541](https://github.com/user-attachments/assets/a3d2849d-4ed0-4b5b-adca-48dcd07132ca)](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json)
 
-The [Comparing Detailers.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json) workflow will allow you to compare these various detailer nodes on the same prompt and seed.
+- Flux - The [Comparing Detailers.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json) workflow (Flux) will allow you to compare these various detailer nodes on the same prompt and seed.
+- SDXL - The [SDXL txt2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/SDXL%20txt2img-DetailDaemon.json) workflow also shows a Detail Daemon node/graph example and testing.
 
 ## Credits
 
