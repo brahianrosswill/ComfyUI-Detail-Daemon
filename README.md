@@ -41,7 +41,7 @@ Allows graphing adjusted sigmas to visually see the effects of different paramet
 Simple node to multiply all sigmas (noise levels) by the supplied factor. It multiplies both the noise levels added and denoised by the factor, which somehow adds detail with a factor less than 1. It is *stateless*, meaning it calculates the sigmas fresh on every queue (other multiply sigmas nodes seem to calculate on prior run sigmas). Because this multiplies sigmas of all steps (without start or end values), it tends to change the overall composition of the image too.
 
 Parameter:
-- `factor`: the amount that you want to multiply the sigma (noise level) by at each step. So, for example, if the first step has a sigma of 1, then using a factor of 0.95 would make this sigma 0.95. If a step has a sigma of 0.7, then a factor of 0.95 would make it 0.665. You probably want to keep this factor between 0.95-0.99. Lower values increase detail, but might also increasingly change the composition of the image, or introduce noisy grain. Setting it to 1.0 effectively disables the node. 
+- `factor`: the amount that you want to multiply the sigma (noise level) by at each step. So, for example, if the first step has a sigma of 1, then using a factor of 0.95 would make this sigma 0.95. If a step has a sigma of 0.7, then a factor of 0.95 would make it 0.665. You probably want to keep this factor between 0.95—0.99. Lower values increase detail, but might also increasingly change the composition of the image, or introduce noisy grain. Setting it to 1.0 effectively disables the node. 
 
 ### Lying Sigma Sampler
 
