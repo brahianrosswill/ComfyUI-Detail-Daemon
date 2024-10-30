@@ -50,7 +50,7 @@ Parameter:
 A simpler version of Detail Daemon Sampler, with only amount adjustment and start and end values.
 
 Parameters:
-- `dishonesty_factor`: similar to `detail_amount` in the Detail Daemon node, this adjusts the amount of detail. It is on a different scale though, for example, -0.05 `dishonesty_factor` is the equivalent of 0.5 in `detail_amount` of Detail Daemon. Negative values adjust the sigmas down, increasing detail. You probably want to stay between -0.1 and -0.01. Positive values would increase the sigmas, *decreasing* detail.
+- `dishonesty_factor`: similar to `detail_amount` in the Detail Daemon node, this adjusts the amount of detail. It is on a different scale though, for example, -0.05 `dishonesty_factor` is the equivalent of 0.5 in `detail_amount` of Detail Daemon (or 0.95 of Multiply Sigmas). Negative values adjust the sigmas down, increasing detail. You probably want to stay between -0.1 and -0.01. Positive values would increase the sigmas, *decreasing* detail.
 - `start_percent`: when do you want the adjustment to start, in a percent range from 0–1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.1–0.5
 - `end_percent`: when do you want the adjustment to end, in a percent range from 0–1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.5–0.9
 
