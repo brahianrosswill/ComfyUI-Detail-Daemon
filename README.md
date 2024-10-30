@@ -17,9 +17,9 @@ A port of muerrilla's [sd-webui-Detail-Daemon](https://github.com/muerrilla/sd-w
 Allows sampling with the Detail Daemon schedule adjustment, which keeps the noise levels injected the same while lowering the amount of noise removed at each step, which effectively adds detail. Detail_amounts between 0 and 1.0 work best. See muerrilla's [Detail Daemon](https://github.com/muerrilla/sd-webui-detail-daemon/) repo for full explanation of inputs and methodology.
 
 Parameters (the graphing node below can help visualize these parameters):
-- `detail_amount`: the main value that adjusts the detail in the middle of the generation process. Positive values lower the sigmas, reducing noise removed at each step, which increases detail. For Flux models, you'll probably want between 0.1—1.0 range. For SDXL models, probably less than 0.25. You can also use negative values if you want to *decrease* detail or simplify the image.
-- `start`: when do you want the adjustment to start, in a percent range from 0—1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.1—0.5
-- `end`: when do you want the adjustment to end, in a percent range from 0—1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.5—0.9
+- `detail_amount`: the main value that adjusts the detail in the middle of the generation process. Positive values lower the sigmas, reducing noise removed at each step, which increases detail. For Flux models, you'll probably want between 0.1–1.0 range. For SDXL models, probably less than 0.25. You can also use negative values if you want to *decrease* detail or simplify the image.
+- `start`: when do you want the adjustment to start, in a percent range from 0–1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.1–0.5
+- `end`: when do you want the adjustment to end, in a percent range from 0–1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.5–0.9
 - `bias`: shifts the detail_amount in the middle steps forward or back in the generation process.
 - `exponent`: changes the curvature of the adjustment. 0 is no curvature, 1 is smoothly curved.
 - `start_offset`: start the detail_amount at a particular value at the beginning of the generation process. Not recommended.
@@ -41,7 +41,7 @@ Allows graphing adjusted sigmas to visually see the effects of different paramet
 Simple node to multiply all sigmas (noise levels) by the supplied factor. It multiplies both the noise levels added and denoised by the factor, which somehow adds detail with a factor less than 1. It is *stateless*, meaning it calculates the sigmas fresh on every queue (other multiply sigmas nodes seem to calculate on prior run sigmas). Because this multiplies sigmas of all steps (without start or end values), it tends to change the overall composition of the image too.
 
 Parameter:
-- `factor`: the amount that you want to multiply the sigma (noise level) by at each step. So, for example, if the first step has a sigma of 1, then using a factor of 0.95 would make this sigma 0.95. If a step has a sigma of 0.7, then a factor of 0.95 would make it 0.665. You probably want to keep this factor between 0.95—0.99. Lower values increase detail, but might also increasingly change the composition of the image, or introduce noisy grain. Setting it to 1.0 effectively disables the node. 
+- `factor`: the amount that you want to multiply the sigma (noise level) by at each step. So, for example, if the first step has a sigma of 1, then using a factor of 0.95 would make this sigma 0.95. If a step has a sigma of 0.7, then a factor of 0.95 would make it 0.665. You probably want to keep this factor between 0.95–0.99. Lower values increase detail, but might also increasingly change the composition of the image, or introduce noisy grain. Setting it to 1.0 effectively disables the node. 
 
 ### Lying Sigma Sampler
 
@@ -51,8 +51,8 @@ A simpler version of Detail Daemon Sampler, with only amount adjustment and star
 
 Parameters:
 - `dishonesty_factor`: similar to `detail_amount` in the Detail Daemon node, this adjusts the amount of detail. It is on a different scale though, for example, -0.05 `dishonesty_factor` is the equivalent of 0.5 in `detail_amount` of Detail Daemon. Negative values adjust the sigmas down, increasing detail. You probably want to stay between -0.1 and -0.01. Positive values would increase the sigmas, *decreasing* detail.
-- `start_percent`: when do you want the adjustment to start, in a percent range from 0—1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.1—0.5
-- `end_percent`: when do you want the adjustment to end, in a percent range from 0—1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.5—0.9
+- `start_percent`: when do you want the adjustment to start, in a percent range from 0–1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.1–0.5
+- `end_percent`: when do you want the adjustment to end, in a percent range from 0–1.0, 0 being the first step, 1.0 being the last step. Recommended: 0.5–0.9
 
 ## Example and testing workflows
 
