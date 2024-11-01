@@ -60,6 +60,7 @@ Parameters:
 
 - Flux - The [Comparing Detailers.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json) workflow will allow you to compare all these various detailer nodes on the same prompt and seed.
 - Flux img2img - The [Flux img2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Flux%20img2img-DetailDaemon.json) is an example of using Detail Daemon in a Flux img2img workflow.
+- Flux upscale - The [Flux upscale-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Flux%20upscale-Detail%20Daemon.json) is an examle of using Detail Daemon in a Flux upscale workflow.
 - SDXL - The [SDXL txt2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/SDXL%20txt2img-DetailDaemon.json) is an example of using Detail Daemon in a SDXL workflow.
 
 ## Credits
