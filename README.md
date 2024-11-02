@@ -3,10 +3,12 @@
 
 A port of muerrilla's [sd-webui-Detail-Daemon](https://github.com/muerrilla/sd-webui-detail-daemon/) as a node for ComfyUI, to adjust sigmas that generally enhance details, and possibly remove unwanted bokeh or background blurring, particularly with Flux models (but also works with SDXL, SD1.5, and likely other models). If the values are taken too far it results in an oversharpened and/or HDR effect. There are four nodes here. Multiply Sigmas and Lying Sigma Sampler are also included as alternative methods of generally enhancing details.
 
-- **Detail Daemon Sampler**
-- **Detail Daemon Graph Sigmas** (to graph the sigmas adjustment visually)
-- **Multiply Sigmas** (stateless)
-- **Lying Sigma Sampler**
+- [**Detail Daemon Sampler**](#detail-daemon-sampler)
+- [**Detail Daemon Graph Sigmas**](#detail-daemon-graph-sigmas) (to graph the sigmas adjustment visually)
+- [**Multiply Sigmas**](#multiply-sigmas) (stateless)
+- [**Lying Sigma Sampler**](#lying-sigma-sampler)
+
+[Example and testing workflows](#example-and-testing-workflows) are also available.
 
 ## Nodes
 
