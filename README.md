@@ -58,10 +58,11 @@ Parameters:
 
 [![Screenshot 2024-10-29 134541](https://github.com/user-attachments/assets/a3d2849d-4ed0-4b5b-adca-48dcd07132ca)](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json)
 
-- **Flux**: the [Comparing Detailers.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Comparing%20Detailers.json) workflow will allow you to compare all these various detailer nodes on the same prompt and seed.
-- **Flux img2img**: the [Flux img2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Flux%20img2img-DetailDaemon.json) is an example of using Detail Daemon in a Flux img2img workflow.
-- **Flux upscale**: the [Flux upscale-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/Flux%20upscale-Detail%20Daemon.json) is an examle of using Detail Daemon in a Flux upscale workflow.
-- **SDXL**: the [SDXL txt2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/SDXL%20txt2img-DetailDaemon.json) is an example of using Detail Daemon in a SDXL workflow.
+- **Flux**: the [Comparing Detailers.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/example_workflows/Comparing%20Detailers.json) workflow will allow you to compare all these various detailer nodes on the same prompt and seed.
+- **Flux img2img**: the [Flux img2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/example_workflows/Flux%20img2img-DetailDaemon.json) is an example of using Detail Daemon in a Flux img2img workflow.
+- **Flux upscale**: the [Flux upscale-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/example_workflows/Flux%20upscale-Detail%20Daemon.json) is an example of using Detail Daemon in a Flux upscale workflow.
+- **Flux inpainting**: the [Flux inpainting-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/example_workflows/Flux%20inpainting-Detail%20Daemon.json) is an example of using Detail Daemon in a Flux inpainting workflow.
+- **SDXL**: the [SDXL txt2img-DetailDaemon.json](https://github.com/Jonseed/ComfyUI-Detail-Daemon/blob/main/example_workflows/SDXL%20txt2img-DetailDaemon.json) is an example of using Detail Daemon in a SDXL workflow.
 
 ## Credits
 
