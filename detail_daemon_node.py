@@ -409,7 +409,9 @@ class MultiplySigmas:
         return {
             "required": {
                 "sigmas": ("SIGMAS", {"forceInput": True}),
-                "factor": ("FLOAT", {"default": 1, "min": 0, "max": 100, "step": 0.001})
+                "factor": ("FLOAT", {"default": 1, "min": 0, "max": 100, "step": 0.001}),
+                "start": ("FLOAT", {"default": 0, "min": 0, "max": 1, "step": 0.001}),
+                "end": ("FLOAT", {"default": 1, "min": 0, "max": 1, "step": 0.001})
             }
         }
 
@@ -417,10 +419,18 @@ class MultiplySigmas:
     RETURN_TYPES = ("SIGMAS",)
     CATEGORY = "sampling/custom_sampling/sigmas"
 
-    def simple_output(self, sigmas, factor):
+    def simple_output(self, sigmas, factor, start, end):
         # Clone the sigmas to ensure the input is not modified (stateless)
         sigmas = sigmas.clone()
-        return (sigmas * factor,)
+        
+        total_sigmas = len(sigmas)
+        start_idx = int(start * total_sigmas)
+        end_idx = int(end * total_sigmas)
+
+        for i in range(start_idx, end_idx):
+            sigmas[i] *= factor
+
+        return (sigmas,)
 
 #LyingSigmaSampler
 def lying_sigma_sampler(

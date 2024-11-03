@@ -1,6 +1,6 @@
 {
-  "last_node_id": 100,
-  "last_link_id": 202,
+  "last_node_id": 103,
+  "last_link_id": 207,
   "nodes": [
     {
       "id": 22,
@@ -183,52 +183,6 @@
       ]
     },
     {
-      "id": 29,
-      "type": "BasicScheduler",
-      "pos": {
-        "0": 230,
-        "1": 590
-      },
-      "size": {
-        "0": 315,
-        "1": 106
-      },
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 195,
-          "slot_index": 0
-        }
-      ],
-      "outputs": [
-        {
-          "name": "SIGMAS",
-          "type": "SIGMAS",
-          "links": [
-            96,
-            120,
-            163,
-            164,
-            202
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "BasicScheduler"
-      },
-      "widgets_values": [
-        "beta",
-        20,
-        1
-      ]
-    },
-    {
       "id": 25,
       "type": "BasicGuider",
       "pos": {
@@ -281,10 +235,10 @@
         "0": 750,
         "1": 280
       },
-      "size": [
-        236.8000030517578,
-        106
-      ],
+      "size": {
+        "0": 236.8000030517578,
+        "1": 106
+      },
       "flags": {
         "collapsed": true
       },
@@ -388,8 +342,8 @@
       "id": 78,
       "type": "VAEDecode",
       "pos": {
-        "0": 909.2210693359375,
-        "1": 781.3582763671875
+        "0": 911.50830078125,
+        "1": 783.6454467773438
       },
       "size": {
         "0": 210,
@@ -432,8 +386,8 @@
       "id": 77,
       "type": "SamplerCustomAdvanced",
       "pos": {
-        "0": 876.2210693359375,
-        "1": 710.3582763671875
+        "0": 878.50830078125,
+        "1": 712.6454467773438
       },
       "size": {
         "0": 355.20001220703125,
@@ -498,8 +452,8 @@
       "id": 71,
       "type": "LyingSigmaSampler",
       "pos": {
-        "0": 821.2210693359375,
-        "1": 538.3582763671875
+        "0": 823.50830078125,
+        "1": 540.6454467773438
       },
       "size": {
         "0": 315,
@@ -538,13 +492,13 @@
       "id": 98,
       "type": "Image Comparer (rgthree)",
       "pos": {
-        "0": 1725,
-        "1": 457
+        "0": 1727.287109375,
+        "1": 459.28717041015625
       },
-      "size": [
-        427.1917280543039,
-        458.91076775914985
-      ],
+      "size": {
+        "0": 427.1917419433594,
+        "1": 458.9107666015625
+      },
       "flags": {},
       "order": 25,
       "mode": 0,
@@ -580,154 +534,6 @@
             "url": "/api/view?filename=rgthree.compare._temp_sppos_00002_.png&type=temp&subfolder=&rand=0.8074629265257474"
           }
         ]
-      ]
-    },
-    {
-      "id": 83,
-      "type": "SamplerCustomAdvanced",
-      "pos": {
-        "0": 871,
-        "1": 1266
-      },
-      "size": {
-        "0": 355.20001220703125,
-        "1": 106
-      },
-      "flags": {
-        "collapsed": true
-      },
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "noise",
-          "type": "NOISE",
-          "link": 156
-        },
-        {
-          "name": "guider",
-          "type": "GUIDER",
-          "link": 157
-        },
-        {
-          "name": "sampler",
-          "type": "SAMPLER",
-          "link": 166
-        },
-        {
-          "name": "sigmas",
-          "type": "SIGMAS",
-          "link": 161
-        },
-        {
-          "name": "latent_image",
-          "type": "LATENT",
-          "link": 160
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "LATENT",
-          "links": [
-            162
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "denoised_output",
-          "type": "LATENT",
-          "links": [],
-          "slot_index": 1,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "SamplerCustomAdvanced"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 81,
-      "type": "VAEDecode",
-      "pos": {
-        "0": 898,
-        "1": 1332
-      },
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {
-        "collapsed": true
-      },
-      "order": 20,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 162
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 154
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            155,
-            200
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEDecode"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 70,
-      "type": "MultiplySigmas",
-      "pos": {
-        "0": 805,
-        "1": 1113
-      },
-      "size": {
-        "0": 340.20001220703125,
-        "1": 58
-      },
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "sigmas",
-          "type": "SIGMAS",
-          "link": 120
-        }
-      ],
-      "outputs": [
-        {
-          "name": "SIGMAS",
-          "type": "SIGMAS",
-          "links": [
-            161
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "MultiplySigmas"
-      },
-      "widgets_values": [
-        0.96
       ]
     },
     {
@@ -768,12 +574,12 @@
           {
             "name": "A",
             "selected": true,
-            "url": "/api/view?filename=rgthree.compare._temp_ufgfb_00001_.png&type=temp&subfolder=&rand=0.13575831908417668"
+            "url": "/api/view?filename=rgthree.compare._temp_cquhl_00001_.png&type=temp&subfolder=&rand=0.2284940106180524"
           },
           {
             "name": "B",
             "selected": true,
-            "url": "/api/view?filename=rgthree.compare._temp_ufgfb_00002_.png&type=temp&subfolder=&rand=0.016746592089738277"
+            "url": "/api/view?filename=rgthree.compare._temp_cquhl_00002_.png&type=temp&subfolder=&rand=0.11443615799445639"
           }
         ]
       ]
@@ -821,10 +627,10 @@
         "0": -149,
         "1": 513
       },
-      "size": [
-        348.06178974639465,
-        394.86941545934815
-      ],
+      "size": {
+        "0": 348.0617980957031,
+        "1": 394.8694152832031
+      },
       "flags": {},
       "order": 6,
       "mode": 0,
@@ -1047,10 +853,10 @@
         "0": 1276,
         "1": -82
       },
-      "size": [
-        444.4699480543038,
-        458.2214477591497
-      ],
+      "size": {
+        "0": 444.4699401855469,
+        "1": 458.221435546875
+      },
       "flags": {},
       "order": 21,
       "mode": 0,
@@ -1075,10 +881,10 @@
         "0": 1728,
         "1": -82
       },
-      "size": [
-        438.29682805430366,
-        458.2214477591497
-      ],
+      "size": {
+        "0": 438.29681396484375,
+        "1": 458.221435546875
+      },
       "flags": {},
       "order": 23,
       "mode": 0,
@@ -1120,8 +926,8 @@
       "id": 79,
       "type": "PreviewImage",
       "pos": {
-        "0": 1269,
-        "1": 452
+        "0": 1271.287109375,
+        "1": 454.28717041015625
       },
       "size": {
         "0": 441.1180114746094,
@@ -1179,12 +985,12 @@
         "0": 974,
         "1": -108
       },
-      "size": [
-        281.2543248249958,
-        486
-      ],
+      "size": {
+        "0": 281.25433349609375,
+        "1": 486
+      },
       "flags": {},
-      "order": 12,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -1207,6 +1013,201 @@
         0,
         0,
         false,
+        1
+      ]
+    },
+    {
+      "id": 29,
+      "type": "BasicScheduler",
+      "pos": {
+        "0": 230,
+        "1": 590
+      },
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 195,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            96,
+            163,
+            164,
+            202,
+            205
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BasicScheduler"
+      },
+      "widgets_values": [
+        "beta",
+        20,
+        1
+      ]
+    },
+    {
+      "id": 83,
+      "type": "SamplerCustomAdvanced",
+      "pos": {
+        "0": 877,
+        "1": 1340
+      },
+      "size": {
+        "0": 355.20001220703125,
+        "1": 106
+      },
+      "flags": {
+        "collapsed": true
+      },
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 156
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 157
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 166
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 206
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 160
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            162
+          ],
+          "slot_index": 0,
+          "shape": 3
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [],
+          "slot_index": 1,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SamplerCustomAdvanced"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 81,
+      "type": "VAEDecode",
+      "pos": {
+        "0": 899,
+        "1": 1389
+      },
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {
+        "collapsed": true
+      },
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 162
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 154
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            155,
+            200
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 103,
+      "type": "MultiplySigmas",
+      "pos": {
+        "0": 827,
+        "1": 1175
+      },
+      "size": {
+        "0": 340.20001220703125,
+        "1": 106
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 205
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            206
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MultiplySigmas"
+      },
+      "widgets_values": [
+        0.96,
+        0,
         1
       ]
     }
@@ -1333,14 +1334,6 @@
       "LATENT"
     ],
     [
-      120,
-      29,
-      0,
-      70,
-      0,
-      "SIGMAS"
-    ],
-    [
       140,
       22,
       0,
@@ -1461,14 +1454,6 @@
       "LATENT"
     ],
     [
-      161,
-      70,
-      0,
-      83,
-      3,
-      "SIGMAS"
-    ],
-    [
       162,
       83,
       0,
@@ -1579,6 +1564,22 @@
       100,
       0,
       "SIGMAS"
+    ],
+    [
+      205,
+      29,
+      0,
+      103,
+      0,
+      "SIGMAS"
+    ],
+    [
+      206,
+      103,
+      0,
+      83,
+      3,
+      "SIGMAS"
     ]
   ],
   "groups": [
@@ -1597,8 +1598,8 @@
     {
       "title": "Lying Sigmas",
       "bounding": [
-        723,
-        396,
+        725,
+        399,
         1445,
         530
       ],
@@ -1634,10 +1635,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.46650738020973337,
+      "scale": 0.5131581182307069,
       "offset": [
-        1156.420378729258,
-        253.14073256747525
+        684.079338698325,
+        186.53831665466834
       ]
     }
   },
