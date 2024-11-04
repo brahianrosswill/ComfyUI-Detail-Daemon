@@ -8,7 +8,7 @@ A port of muerrilla's [sd-webui-Detail-Daemon](https://github.com/muerrilla/sd-w
 - [**Multiply Sigmas**](#multiply-sigmas) (stateless)
 - [**Lying Sigma Sampler**](#lying-sigma-sampler)
 
-Note that these nodes work by default with custom sampler nodes such as `SamplerCustomAdvanced`. If you want to use them with non-custom sampler nodes such as `KSampler` or `KSamplerAdvanced`, then you'll need to make a custom sampler preset using the [`BlehSetSamplerPreset`](https://github.com/blepping/ComfyUI-bleh#blehsetsamplerpreset) node, so you can select the preset from the list in the sampler node, [as discussed here](https://github.com/Jonseed/ComfyUI-Detail-Daemon/discussions/4#discussioncomment-11134965).
+Note that Detail Daemon and Lying Sigma Sampler nodes work by default with custom sampler nodes such as `SamplerCustomAdvanced`. If you want to use them with non-custom sampler nodes such as `KSampler` or `KSamplerAdvanced`, then you'll need to make a custom sampler preset using the [`BlehSetSamplerPreset`](https://github.com/blepping/ComfyUI-bleh#blehsetsamplerpreset) node, so you can select the preset from the list in the sampler node, [as discussed here](https://github.com/Jonseed/ComfyUI-Detail-Daemon/discussions/4#discussioncomment-11134965).
 
 [Example and testing workflows](#example-and-testing-workflows) are also available.
 
