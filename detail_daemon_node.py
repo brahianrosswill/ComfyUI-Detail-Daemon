@@ -4,6 +4,13 @@ from __future__ import annotations
 
 import io
 
+# Trying matplotlib NSWindow warning workaround on macOS
+import platform
+
+if platform.system() == 'Darwin':  # Check if running on macOS
+    import matplotlib
+    matplotlib.use('Agg')  # Set non-GUI backend to avoid crashes
+
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
