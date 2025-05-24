@@ -292,7 +292,7 @@ def detail_daemon_sampler(
         if not (sigma_min <= sigma_float <= sigma_max):
             return model(x, sigma, **extra_args)
         dd_adjustment = get_dd_schedule(sigma_float, sigmas_cpu, dd_schedule) * 0.1
-        adjusted_sigma = sigma * max(1e-06, 1.0 - dd_adjustment * cfg_scale)
+        adjusted_sigma = sigma * max(0.001, 1.0 - dd_adjustment * cfg_scale)
         return model(x, adjusted_sigma, **extra_args)
 
     for k in (
