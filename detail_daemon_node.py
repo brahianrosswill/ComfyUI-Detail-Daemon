@@ -419,18 +419,16 @@ def detail_daemon_wan21_sampler(
     *,
     dds_wrapped_sampler: object,
     dds_make_schedule: callable,
-    dds_cfg_scale_override: float,
+    # dds_cfg_scale_override: float, # This parameter is removed
     **kwargs: dict,
 ) -> torch.Tensor:
-    if dds_cfg_scale_override > 0:
-        cfg_scale = dds_cfg_scale_override
-    else:
-        # wan 2.1 might have a different way to access CFG scale or model configuration;
-        # this might need adjustment.
-        maybe_cfg_scale = getattr(model.inner_model, "cfg", None)
-        cfg_scale = (
-            float(maybe_cfg_scale) if isinstance(maybe_cfg_scale, (int, float)) else 1.0
-        )
+    # wan 2.1 might have a different way to access CFG scale or model configuration;
+    # this might need adjustment.
+    # For now, we exclusively use the model's CFG scale.
+    maybe_cfg_scale = getattr(model.inner_model, "cfg", None)
+    cfg_scale = (
+        float(maybe_cfg_scale) if isinstance(maybe_cfg_scale, (int, float)) else 1.0
+    )
     dd_schedule = torch.tensor(
         dds_make_schedule(len(sigmas) - 1),
         dtype=torch.float32,
@@ -509,17 +507,7 @@ class DetailDaemonWan21SamplerNode:
                     {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.05},
                 ),
                 "smooth": ("BOOLEAN", {"default": True}),
-                "cfg_scale_override": (
-                    "FLOAT",
-                    {
-                        "default": 0,
-                        "min": 0.0,
-                        "max": 100.0,
-                        "step": 0.5,
-                        "round": 0.01,
-                        "tooltip": "If set to 0, the sampler will automatically determine the CFG scale (if possible). Set to some other value to override.",
-                    },
-                ),
+                # "cfg_scale_override" is removed from here
             },
         }
 
@@ -537,7 +525,7 @@ class DetailDaemonWan21SamplerNode:
         end_offset,
         fade,
         smooth,
-        cfg_scale_override,
+        # cfg_scale_override, # This parameter is removed
     ) -> tuple:
         def dds_make_schedule(steps):
             return make_detail_daemon_schedule(
@@ -559,7 +547,7 @@ class DetailDaemonWan21SamplerNode:
                 extra_options={
                     "dds_wrapped_sampler": sampler,
                     "dds_make_schedule": dds_make_schedule,
-                    "dds_cfg_scale_override": cfg_scale_override,
+                    # "dds_cfg_scale_override": cfg_scale_override, # This is removed
                 },
             ),
         )
