@@ -409,6 +409,150 @@ class DetailDaemonSamplerNode:
             ),
         )
 
+
+def detail_daemon_wan21_sampler(
+    # This function is intended for the "wan 2.1" video generator.
+    # It adapts the detail daemon logic for video generation.
+    model: object,
+    x: torch.Tensor,
+    sigmas: torch.Tensor,
+    *,
+    dds_wrapped_sampler: object,
+    dds_make_schedule: callable,
+    # dds_cfg_scale_override: float, # This parameter is removed
+    **kwargs: dict,
+) -> torch.Tensor:
+    # wan 2.1 might have a different way to access CFG scale or model configuration;
+    # this might need adjustment.
+    # For now, we exclusively use the model's CFG scale.
+    maybe_cfg_scale = getattr(model.inner_model, "cfg", None)
+    cfg_scale = (
+        float(maybe_cfg_scale) if isinstance(maybe_cfg_scale, (int, float)) else 1.0
+    )
+    dd_schedule = torch.tensor(
+        dds_make_schedule(len(sigmas) - 1),
+        dtype=torch.float32,
+        device="cpu",
+    )
+    sigmas_cpu = sigmas.detach().clone().cpu()
+    sigma_max, sigma_min = float(sigmas_cpu[0]), float(sigmas_cpu[-1]) + 1e-05
+
+    def model_wrapper(x: torch.Tensor, sigma: torch.Tensor, **extra_args: dict):
+        sigma_float = float(sigma.max().detach().cpu())
+        if not (sigma_min <= sigma_float <= sigma_max):
+            return model(x, sigma, **extra_args)
+        dd_adjustment = get_dd_schedule(sigma_float, sigmas_cpu, dd_schedule) * 0.1
+        adjusted_sigma = sigma * max(0.001, 1.0 - dd_adjustment * cfg_scale)
+        # wan 2.1 model interaction: Ensure 'model', 'x', and 'adjusted_sigma' are
+        # compatible with wan 2.1's API. Specific conditioning or attributes
+        # for wan 2.1 might need to be handled here.
+        return model(x, adjusted_sigma, **extra_args)
+
+    for k in (
+        "inner_model",
+        "sigmas",
+    ):
+        if hasattr(model, k):
+            setattr(model_wrapper, k, getattr(model, k))
+    return dds_wrapped_sampler.sampler_function(
+        model_wrapper,
+        x,
+        sigmas,
+        **kwargs,
+        **dds_wrapped_sampler.extra_options,
+    )
+
+
+class DetailDaemonWan21SamplerNode:
+    DESCRIPTION = "This sampler wrapper is adapted for the wan 2.1 video generator. It adjusts sigmas based on a schedule to control detail."
+    CATEGORY = "sampling/custom_sampling/samplers/wan2.1"
+    RETURN_TYPES = ("SAMPLER",)
+    FUNCTION = "go"
+
+    @classmethod
+    def INPUT_TYPES(cls) -> dict:
+        return {
+            "required": {
+                "sampler": ("SAMPLER",),
+                "detail_amount": (
+                    "FLOAT",
+                    {"default": 0.1, "min": -5.0, "max": 5.0, "step": 0.01},
+                ),
+                "start": (
+                    "FLOAT",
+                    {"default": 0.2, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
+                "end": (
+                    "FLOAT",
+                    {"default": 0.8, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
+                "bias": (
+                    "FLOAT",
+                    {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
+                "exponent": (
+                    "FLOAT",
+                    {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.05},
+                ),
+                "start_offset": (
+                    "FLOAT",
+                    {"default": 0.0, "min": -1.0, "max": 1.0, "step": 0.01},
+                ),
+                "end_offset": (
+                    "FLOAT",
+                    {"default": 0.0, "min": -1.0, "max": 1.0, "step": 0.01},
+                ),
+                "fade": (
+                    "FLOAT",
+                    {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.05},
+                ),
+                "smooth": ("BOOLEAN", {"default": True}),
+                # "cfg_scale_override" is removed from here
+            },
+        }
+
+    @classmethod
+    def go(
+        cls,
+        sampler: object,
+        *,
+        detail_amount,
+        start,
+        end,
+        bias,
+        exponent,
+        start_offset,
+        end_offset,
+        fade,
+        smooth,
+        # cfg_scale_override, # This parameter is removed
+    ) -> tuple:
+        def dds_make_schedule(steps):
+            return make_detail_daemon_schedule(
+                steps,
+                start,
+                end,
+                bias,
+                detail_amount,
+                exponent,
+                start_offset,
+                end_offset,
+                fade,
+                smooth,
+            )
+
+        return (
+            KSAMPLER(
+                detail_daemon_wan21_sampler,
+                extra_options={
+                    "dds_wrapped_sampler": sampler,
+                    "dds_make_schedule": dds_make_schedule,
+                    # "dds_cfg_scale_override": cfg_scale_override, # This is removed
+                },
+            ),
+        )
+
+
 #MultiplySigmas Node
 class MultiplySigmas:
     @classmethod
@@ -517,4 +661,21 @@ class LyingSigmaSamplerNode:
                 },
             ),
         )
+
+
+NODE_CLASS_MAPPINGS = {
+    "DetailDaemonSampler": DetailDaemonSamplerNode,
+    "DetailDaemonGraphSigmas": DetailDaemonGraphSigmasNode,
+    "MultiplySigmas": MultiplySigmas,
+    "LyingSigmaSampler": LyingSigmaSamplerNode,
+    "DetailDaemonWan21Sampler": DetailDaemonWan21SamplerNode,
+}
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "DetailDaemonSampler": "Detail Daemon Sampler",
+    "DetailDaemonGraphSigmas": "Detail Daemon Graph Sigmas",
+    "MultiplySigmas": "Multiply Sigmas",
+    "LyingSigmaSampler": "Lying Sigma Sampler",
+    "DetailDaemonWan21Sampler": "Detail Daemon Sampler (wan 2.1)",
+}
 
