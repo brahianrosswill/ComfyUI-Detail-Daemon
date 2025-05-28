@@ -32,6 +32,44 @@ Parameters (the graphing node below can help visualize these parameters):
 - `smooth`: (true/false), do you want the adjustment curve to be smooth or not.
 - `cfg_scale_override`: if set to 0 (default), the sampler will automatically determine the CFG scale (if possible). Set to some other value to override (should probably match the CFG used in your workflow).
 
+### Advanced Artifact Control (New!)
+
+The Detail Daemon node now includes advanced features to help you push `detail_amount` for stronger effects while minimizing common artifacts like bright, isolated pixels ("fireflies"). This is achieved through an adaptive schedule calculation and a new `artifact_control` parameter.
+
+**Understanding the Key Parameters:**
+
+*   **`detail_amount`**: This remains your primary control for the overall strength of the detail effect.
+    *   Internally, this value is first scaled using `tanh` to prevent extremely large inputs from immediately destabilizing the schedule.
+    *   **Adaptive Exponent**: The `exponent` you provide for the schedule curve now adapts automatically. As you increase `detail_amount` (making `abs(tanh(detail_amount))` larger), the effective exponent used to generate the schedule becomes gentler. This helps to naturally smooth out very sharp schedule transitions that can occur with high `detail_amount` and aggressive exponents.
+
+*   **`artifact_control` (New Parameter)**:
+    *   **Range**: 0.0 to 1.0
+    *   **Default**: 0.5
+    *   **Purpose**: This parameter directly controls how much smoothing is applied to the final detail schedule by limiting the maximum change (delta) allowed between any two consecutive steps in the schedule.
+    *   **How it works**:
+        *   **`artifact_control = 0.0`**: Maximum smoothing. The allowed change between schedule steps is smallest. Use this if you are seeing persistent artifacts even at moderate `detail_amount` settings, or if you want the smoothest possible schedule.
+        *   **`artifact_control = 0.5`**: Balanced smoothing. This is the default and provides a good starting point.
+        *   **`artifact_control = 1.0`**: Minimum smoothing. The allowed change between schedule steps is largest. Use this if artifacts are not an issue for you, and you want to allow the schedule to have more variance and potentially sharper effects.
+
+**Practical Workflow for Tuning:**
+
+1.  **Start with `detail_amount`**: Begin by setting the `detail_amount` to a level where you start seeing the desired detail enhancement, even if some minor artifacts appear. Use the `exponent` parameter as you normally would to shape the general curve.
+2.  **Introduce `artifact_control`**:
+    *   If you observe bright pixels or fireflies, try decreasing `artifact_control` from its default of 0.5. Values like 0.25 or even 0.0 can provide stronger smoothing and artifact reduction.
+    *   If the image feels too "smoothed out" or the detail effect is too dampened by a low `artifact_control` value, try increasing it (e.g., towards 0.75 or 1.0). This gives the schedule more freedom but might reintroduce artifacts if `detail_amount` is very high.
+3.  **Balance `detail_amount` and `artifact_control`**:
+    *   The goal is to find a balance. You might be able to use a higher `detail_amount` than before if you also set an appropriate `artifact_control` value.
+    *   For example, if a high `detail_amount` (e.g., 0.8) previously caused too many artifacts, you might now be able to use that same `detail_amount` but with `artifact_control` set to 0.25 to mitigate those artifacts.
+4.  **Iterate**: Adjust `detail_amount` and `artifact_control` (and potentially your main `exponent` if the general curve shape needs tweaking) until you achieve the best trade-off between detail enhancement and artifact suppression for your specific image and style.
+
+**Example Scenario:**
+
+*   You set `detail_amount` to 0.7 and `exponent` to 2.0. You see good detail, but also some distracting bright pixels.
+*   **Action**: Try setting `artifact_control` to 0.3.
+*   **Result**: The bright pixels are significantly reduced, and the main detail effect is largely preserved. If the detail is still too aggressive, you might slightly lower `detail_amount` or further reduce `artifact_control`. If the image became too soft, you could try `artifact_control` at 0.4 or 0.5.
+
+Remember that the visual impact of these settings can also depend on the sampler, CFG scale, and the content of your image. Experimentation is key!
+
 ### Detail Daemon Graph Sigmas
 
 ![Screenshot 2024-10-29 131939](https://github.com/user-attachments/assets/d0a3f895-5f6d-4b94-b4d1-aa86e7acb5d7)
