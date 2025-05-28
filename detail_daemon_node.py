@@ -6,6 +6,7 @@ import io
 
 # Trying matplotlib NSWindow warning workaround on macOS
 import platform
+import math # Added for tanh
 
 if platform.system() == 'Darwin':  # Check if running on macOS
     import matplotlib
@@ -33,7 +34,24 @@ def make_detail_daemon_schedule(
     end_offset,
     fade,
     smooth,
+    artifact_control=0.5, # New parameter with default
 ):
+    # Apply tanh to detail_amount (passed as 'amount') to dampen extreme values.
+    # tanh will map 'amount' to a range of -1 to 1.
+    # This helps prevent overly aggressive adjustments when detail_amount is very high or low.
+    scaled_amount = math.tanh(amount)
+    # If the original 'amount' was intended to be used in a larger range,
+    # 'scaled_amount' can be further multiplied by a factor here.
+    # For now, we'll use the -1 to 1 range directly.
+
+    # Adaptive exponent calculation
+    # K is a sensitivity factor for how much scaled_amount affects the exponent.
+    # K = 0.75 means at full scaled_amount (1 or -1), exponent is divided by 1.75.
+    K = 0.75
+    effective_exponent = exponent / (1 + abs(scaled_amount) * K)
+    # Ensure the effective_exponent does not become too small to prevent extreme curve shapes or errors.
+    effective_exponent = max(0.1, effective_exponent)
+
     start = min(start, end)
     mid = start + bias * (end - start)
     multipliers = np.zeros(steps)
@@ -45,17 +63,21 @@ def make_detail_daemon_schedule(
     start_values = np.linspace(0, 1, mid_idx - start_idx + 1)
     if smooth:
         start_values = 0.5 * (1 - np.cos(start_values * np.pi))
-    start_values = start_values**exponent
+    # Use effective_exponent instead of the original exponent
+    start_values = start_values**effective_exponent
     if start_values.any():
-        start_values *= amount - start_offset
+        # Use scaled_amount instead of amount
+        start_values *= scaled_amount - start_offset
         start_values += start_offset
 
     end_values = np.linspace(1, 0, end_idx - mid_idx + 1)
     if smooth:
         end_values = 0.5 * (1 - np.cos(end_values * np.pi))
-    end_values = end_values**exponent
+    # Use effective_exponent instead of the original exponent
+    end_values = end_values**effective_exponent
     if end_values.any():
-        end_values *= amount - end_offset
+        # Use scaled_amount instead of amount
+        end_values *= scaled_amount - end_offset
         end_values += end_offset
 
     multipliers[start_idx : mid_idx + 1] = start_values
@@ -63,6 +85,21 @@ def make_detail_daemon_schedule(
     multipliers[:start_idx] = start_offset
     multipliers[end_idx + 1 :] = end_offset
     multipliers *= 1 - fade
+
+    # Limit the rate of change between successive multiplier values
+    # This helps to smooth out abrupt jumps in the schedule.
+    # Controlled by artifact_control: 0.0 = more smoothing (smaller max_delta), 1.0 = less smoothing (larger max_delta)
+    base_max_delta = 0.30
+    min_max_delta = 0.05
+    # artifact_control = 1 -> dynamic_max_delta = base_max_delta
+    # artifact_control = 0 -> dynamic_max_delta = min_max_delta
+    dynamic_max_delta = min_max_delta + (base_max_delta - min_max_delta) * artifact_control
+
+    if steps > 1 : # Only apply if there's more than one step
+        for i in range(1, steps): # Iterate from the second element
+            delta = multipliers[i] - multipliers[i-1]
+            if abs(delta) > dynamic_max_delta:
+                multipliers[i] = multipliers[i-1] + math.copysign(dynamic_max_delta, delta)
 
     return multipliers
 
@@ -116,6 +153,10 @@ class DetailDaemonGraphSigmasNode:
                         "round": 0.01,
                     },
                 ),
+                "artifact_control": ( # New input for artifact_control
+                    "FLOAT",
+                    {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Higher values allow more schedule variance (less smoothing), lower values increase smoothing (more artifact control)."}
+                ),
             },
         }
 
@@ -137,6 +178,7 @@ class DetailDaemonGraphSigmasNode:
         fade,
         smooth,
         cfg_scale,
+        artifact_control, # Added artifact_control parameter
     ):
         # Create a copy of the input sigmas using clone() for tensors to avoid modifying the original
         sigmas = sigmas.clone()
@@ -157,6 +199,7 @@ class DetailDaemonGraphSigmasNode:
             end_offset,
             fade,
             smooth,
+            artifact_control, # Pass artifact_control
         )
 
         # Debugging: print schedule and sigmas lengths to verify alignment
@@ -225,40 +268,49 @@ class DetailDaemonGraphSigmasNode:
 
 def get_dd_schedule(
     sigma: float,
-    sigmas: torch.Tensor,
-    dd_schedule: torch.Tensor,
+    sigmas: torch.Tensor, # Should be sigmas_cpu
+    dd_schedule: torch.Tensor, # Should be on CPU
 ) -> float:
     sched_len = len(dd_schedule)
     if (
         sched_len < 2
         or len(sigmas) < 2
         or sigma <= 0
-        or not (sigmas[-1] <= sigma <= sigmas[0])
+        or not (sigmas[-1] <= sigma <= sigmas[0]) # sigmas is expected to be sorted descending
     ):
         return 0.0
     # First, we find the index of the closest sigma in the list to what the model was
     # called with.
+    # sigmas is expected to be a 1D CPU tensor. sigma is a float.
     deltas = (sigmas[:-1] - sigma).abs()
-    idx = int(deltas.argmin())
+    idx = int(deltas.argmin()) # Convert tensor index to int
+
     if (
         (idx == 0 and sigma >= sigmas[0])
-        or (idx == sched_len - 1 and sigma <= sigmas[-2])
+        or (idx == sched_len - 1 and sigma <= sigmas[-2]) # sigmas[-2] because sigmas has one more element than schedule usually
         or deltas[idx] == 0
     ):
         # Either exact match or closest to head/tail of the DD schedule so we
         # can't interpolate to another schedule item.
-        return dd_schedule[idx].item()
-    # If we're here, that means the sigma is in between two sigmas in the
-    # list.
+        return dd_schedule[idx].item() # dd_schedule is a CPU tensor
+
+    # If we're here, that means the sigma is in between two sigmas in the list.
+    # Original logic for determining idxlow and idxhigh based on int idx
     idxlow, idxhigh = (idx, idx - 1) if sigma > sigmas[idx] else (idx + 1, idx)
+
     # We find the low/high neighbor sigmas - our sigma is somewhere between them.
-    nlow, nhigh = sigmas[idxlow], sigmas[idxhigh]
+    nlow, nhigh = sigmas[idxlow], sigmas[idxhigh] # These are tensor elements (0-dim tensors)
+
     if nhigh - nlow == 0:
-        # Shouldn't be possible, but just in case... Avoid divide by zero.
-        return dd_schedule[idxlow]
+        # Shouldn't be possible if sigmas are distinct, but just in case... Avoid divide by zero.
+        return dd_schedule[idxlow].item() # Return item from dd_schedule at idxlow
+
     # Ratio of how close we are to the high neighbor.
+    # sigma is float, nlow, nhigh are 0-dim tensors; operations will promote sigma to tensor.
     ratio = ((sigma - nlow) / (nhigh - nlow)).clamp(0, 1)
+
     # Mix the DD schedule high/low items according to the ratio.
+    # dd_schedule elements are 0-dim tensors. lerp works with these.
     return torch.lerp(dd_schedule[idxlow], dd_schedule[idxhigh], ratio).item()
 
 
@@ -282,15 +334,16 @@ def detail_daemon_sampler(
     dd_schedule = torch.tensor(
         dds_make_schedule(len(sigmas) - 1),
         dtype=torch.float32,
-        device="cpu",
+        device="cpu",  # Revert to CPU device
     )
-    sigmas_cpu = sigmas.detach().clone().cpu()
-    sigma_max, sigma_min = float(sigmas_cpu[0]), float(sigmas_cpu[-1]) + 1e-05
+    sigmas_cpu = sigmas.detach().clone().cpu() # Reintroduce sigmas_cpu
+    sigma_max, sigma_min = float(sigmas_cpu[0]), float(sigmas_cpu[-1]) + 1e-05 # Use sigmas_cpu
 
     def model_wrapper(x: torch.Tensor, sigma: torch.Tensor, **extra_args: dict):
-        sigma_float = float(sigma.max().detach().cpu())
-        if not (sigma_min <= sigma_float <= sigma_max):
+        sigma_float = float(sigma.max().detach().cpu()) # Reintroduce sigma_float
+        if not (sigma_min <= sigma_float <= sigma_max): # Use sigma_float for comparison
             return model(x, sigma, **extra_args)
+        # Call original get_dd_schedule with sigma_float, sigmas_cpu, and CPU dd_schedule
         dd_adjustment = get_dd_schedule(sigma_float, sigmas_cpu, dd_schedule) * 0.1
         adjusted_sigma = sigma * max(0.001, 1.0 - dd_adjustment * cfg_scale)
         return model(x, adjusted_sigma, **extra_args)
@@ -365,6 +418,10 @@ class DetailDaemonSamplerNode:
                         "tooltip": "If set to 0, the sampler will automatically determine the CFG scale (if possible). Set to some other value to override.",
                     },
                 ),
+                "artifact_control": ( # New input for artifact_control
+                    "FLOAT",
+                    {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Higher values allow more schedule variance (less smoothing), lower values increase smoothing (more artifact control)."}
+                ),
             },
         }
 
@@ -383,8 +440,9 @@ class DetailDaemonSamplerNode:
         fade,
         smooth,
         cfg_scale_override,
+        artifact_control, # Added artifact_control parameter
     ) -> tuple:
-        def dds_make_schedule(steps):
+        def dds_make_schedule(steps): # Closure captures artifact_control from outer scope
             return make_detail_daemon_schedule(
                 steps,
                 start,
@@ -396,6 +454,7 @@ class DetailDaemonSamplerNode:
                 end_offset,
                 fade,
                 smooth,
+                artifact_control, # Pass artifact_control
             )
 
         return (
@@ -432,15 +491,16 @@ def detail_daemon_wan21_sampler(
     dd_schedule = torch.tensor(
         dds_make_schedule(len(sigmas) - 1),
         dtype=torch.float32,
-        device="cpu",
+        device="cpu",  # Revert to CPU device
     )
-    sigmas_cpu = sigmas.detach().clone().cpu()
-    sigma_max, sigma_min = float(sigmas_cpu[0]), float(sigmas_cpu[-1]) + 1e-05
+    sigmas_cpu = sigmas.detach().clone().cpu() # Reintroduce sigmas_cpu
+    sigma_max, sigma_min = float(sigmas_cpu[0]), float(sigmas_cpu[-1]) + 1e-05 # Use sigmas_cpu
 
     def model_wrapper(x: torch.Tensor, sigma: torch.Tensor, **extra_args: dict):
-        sigma_float = float(sigma.max().detach().cpu())
-        if not (sigma_min <= sigma_float <= sigma_max):
+        sigma_float = float(sigma.max().detach().cpu()) # Reintroduce sigma_float
+        if not (sigma_min <= sigma_float <= sigma_max): # Use sigma_float for comparison
             return model(x, sigma, **extra_args)
+        # Call original get_dd_schedule with sigma_float, sigmas_cpu, and CPU dd_schedule
         dd_adjustment = get_dd_schedule(sigma_float, sigmas_cpu, dd_schedule) * 0.1
         adjusted_sigma = sigma * max(0.001, 1.0 - dd_adjustment * cfg_scale)
         # wan 2.1 model interaction: Ensure 'model', 'x', and 'adjusted_sigma' are
@@ -507,6 +567,10 @@ class DetailDaemonWan21SamplerNode:
                     {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.05},
                 ),
                 "smooth": ("BOOLEAN", {"default": True}),
+                "artifact_control": ( # New input for artifact_control
+                    "FLOAT",
+                    {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Higher values allow more schedule variance (less smoothing), lower values increase smoothing (more artifact control)."}
+                ),
                 # "cfg_scale_override" is removed from here
             },
         }
@@ -525,9 +589,10 @@ class DetailDaemonWan21SamplerNode:
         end_offset,
         fade,
         smooth,
+        artifact_control, # Added artifact_control parameter
         # cfg_scale_override, # This parameter is removed
     ) -> tuple:
-        def dds_make_schedule(steps):
+        def dds_make_schedule(steps): # Closure captures artifact_control from outer scope
             return make_detail_daemon_schedule(
                 steps,
                 start,
@@ -539,6 +604,7 @@ class DetailDaemonWan21SamplerNode:
                 end_offset,
                 fade,
                 smooth,
+                artifact_control, # Pass artifact_control
             )
 
         return (
