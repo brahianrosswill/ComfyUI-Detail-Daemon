@@ -728,20 +728,3 @@ class LyingSigmaSamplerNode:
             ),
         )
 
-
-NODE_CLASS_MAPPINGS = {
-    "DetailDaemonSampler": DetailDaemonSamplerNode,
-    "DetailDaemonGraphSigmas": DetailDaemonGraphSigmasNode,
-    "MultiplySigmas": MultiplySigmas,
-    "LyingSigmaSampler": LyingSigmaSamplerNode,
-    "DetailDaemonWan21Sampler": DetailDaemonWan21SamplerNode,
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "DetailDaemonSampler": "Detail Daemon Sampler",
-    "DetailDaemonGraphSigmas": "Detail Daemon Graph Sigmas",
-    "MultiplySigmas": "Multiply Sigmas",
-    "LyingSigmaSampler": "Lying Sigma Sampler",
-    "DetailDaemonWan21Sampler": "Detail Daemon Sampler (wan 2.1)",
-}
-
