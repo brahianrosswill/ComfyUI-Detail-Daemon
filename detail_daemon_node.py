@@ -89,8 +89,8 @@ def make_detail_daemon_schedule(
     # Limit the rate of change between successive multiplier values
     # This helps to smooth out abrupt jumps in the schedule.
     # Controlled by artifact_control: 0.0 = more smoothing (smaller max_delta), 1.0 = less smoothing (larger max_delta)
-    base_max_delta = 0.30
-    min_max_delta = 0.05
+    base_max_delta = 0.15
+    min_max_delta = 0.01
     # artifact_control = 1 -> dynamic_max_delta = base_max_delta
     # artifact_control = 0 -> dynamic_max_delta = min_max_delta
     dynamic_max_delta = min_max_delta + (base_max_delta - min_max_delta) * artifact_control
