@@ -95,11 +95,11 @@ def make_detail_daemon_schedule(
     # artifact_control = 0 -> dynamic_max_delta = min_max_delta
     dynamic_max_delta = min_max_delta + (base_max_delta - min_max_delta) * artifact_control
 
-    if steps > 1 : # Only apply if there's more than one step
-        for i in range(1, steps): # Iterate from the second element
-            delta = multipliers[i] - multipliers[i-1]
-            if abs(delta) > dynamic_max_delta:
-                multipliers[i] = multipliers[i-1] + math.copysign(dynamic_max_delta, delta)
+    if steps > 1:  # Only apply if there's more than one step
+        for i in range(1, steps):  # Iterate from the second element
+            delta = multipliers[i] - multipliers[i - 1]
+            clamped_delta = max(min(delta, dynamic_max_delta), -dynamic_max_delta)
+            multipliers[i] = multipliers[i - 1] + clamped_delta
 
     return multipliers
 
